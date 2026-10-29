@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#0b1410" />
+    <meta name="description" content="Free 3D browser tennis. Play the computer on hard, grass and clay. Works offline." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TennisLive" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <title>TennisLive</title>
+    <script type="module" crossorigin src="./assets/index-CM2Up5Lr.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/three-Brq5CVqZ.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-COa8ABSL.css">
+  <link rel="manifest" href="./manifest.webmanifest"></head>
+  <body>
+    <canvas id="game"></canvas>
+
+    <!-- In-match HUD -->
+    <div id="hud" class="hidden">
+      <div class="scoreboard" aria-live="polite">
+        <div class="sb-row" id="sb-0">
+          <span class="sb-serve"></span><span class="sb-name">YOU</span><span class="sb-games">0</span><span class="sb-points">0</span>
+        </div>
+        <div class="sb-row" id="sb-1">
+          <span class="sb-serve"></span><span class="sb-name">CPU</span><span class="sb-games">0</span><span class="sb-points">0</span>
+        </div>
+        <div class="sb-status" id="sb-status"></div>
+      </div>
+
+      <div class="hud-buttons">
+        <button class="icon-btn" id="btn-pause" aria-label="Pause (P)" title="Pause (P)">
+          <svg viewBox="0 0 24 24"><path d="M7 5h3v14H7zM14 5h3v14h-3z" /></svg>
+        </button>
+        <button class="icon-btn" id="btn-mute" aria-label="Sound (M)" title="Sound (M)">
+          <svg viewBox="0 0 24 24" class="snd-on"><path d="M4 9h4l5-4v14l-5-4H4zM16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" /></svg>
+          <svg viewBox="0 0 24 24" class="snd-off"><path d="M4 9h4l5-4v14l-5-4H4zM17 9l5 6M22 9l-5 6" /></svg>
+        </button>
+        <button class="icon-btn" id="btn-fs" aria-label="Fullscreen (F)" title="Fullscreen (F)">
+          <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+        </button>
+      </div>
+
+      <div class="shot-info">
+        <div class="si-speed"><span id="si-kmh">—</span><small>km/h</small></div>
+        <div class="si-kind" id="si-kind">&nbsp;</div>
+      </div>
+
+      <div class="energy" title="Energy — power shots cost energy">
+        <div class="energy-fill" id="energy-fill"></div>
+        <span>POWER</span>
+      </div>
+
+      <div class="banner" id="banner"></div>
+      <div class="hint" id="hint"></div>
+    </div>
+
+    <!-- Touch controls -->
+    <div id="touch" class="hidden">
+      <div class="stick-zone" id="stick-zone">
+        <div class="stick-base" id="stick-base"><div class="stick-knob" id="stick-knob"></div></div>
+      </div>
+      <div class="touch-buttons">
+        <button class="tbtn tbtn-lob" id="t-lob">LOB</button>
+        <button class="tbtn tbtn-power" id="t-power">POWER</button>
+        <button class="tbtn tbtn-hit" id="t-hit">HIT</button>
+      </div>
+    </div>
+
+    <!-- Main menu -->
+    <div id="menu" class="overlay">
+      <div class="panel menu-panel">
+        <h1 class="logo">TENNIS<span>LIVE</span></h1>
+        <p class="tagline">Free browser tennis · works offline</p>
+
+        <div class="opt-group">
+          <div class="opt-label">Opponent</div>
+          <div class="seg" data-opt="difficulty">
+            <button data-v="easy">Easy</button>
+            <button data-v="club">Club</button>
+            <button data-v="ace">Ace</button>
+            <button data-v="legend">Legend</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="opt-label">Court</div>
+          <div class="seg" data-opt="surface">
+            <button data-v="hard">Hard</button>
+            <button data-v="grass">Grass</button>
+            <button data-v="clay">Clay</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="opt-label">Match</div>
+          <div class="seg" data-opt="length">
+            <button data-v="game">1 game</button>
+            <button data-v="short">Short set</button>
+            <button data-v="set">Full set</button>
+          </div>
+          <div class="opt-note" id="length-note"></div>
+        </div>
+
+        <button class="cta" id="btn-play">PLAY</button>
+        <div class="menu-links">
+          <button class="link" id="btn-help">How to play</button>
+          <button class="link hidden" id="btn-install">Install app</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to play -->
+    <div id="help" class="overlay hidden">
+      <div class="panel help-panel">
+        <h2>How to play</h2>
+        <div class="help-grid">
+          <section>
+            <h3>Keyboard</h3>
+            <dl>
+              <dt><kbd>WASD</kbd> / <kbd>Arrows</kbd></dt><dd>Move</dd>
+              <dt><kbd>Space</kbd></dt><dd>Swing — press just before the ball reaches you</dd>
+              <dt>Hold <kbd>←</kbd>/<kbd>→</kbd> while swinging</dt><dd>Aim left / right</dd>
+              <dt>Hold <kbd>↑</kbd> while swinging</dt><dd>Deep shot</dd>
+              <dt>Hold <kbd>↓</kbd> while swinging</dt><dd>Drop shot</dd>
+              <dt><kbd>Shift</kbd>+<kbd>Space</kbd> or double-tap</dt><dd>Power shot (uses energy)</dd>
+              <dt><kbd>R</kbd></dt><dd>Lob</dd>
+              <dt><kbd>P</kbd> · <kbd>F</kbd> · <kbd>M</kbd></dt><dd>Pause · Fullscreen · Sound</dd>
+            </dl>
+          </section>
+          <section>
+            <h3>Serving</h3>
+            <p>Arrows move the yellow target. <kbd>Space</kbd> tosses the ball. Press <kbd>Space</kbd> again just before the ball reaches the ring above you — the ring turns yellow in the sweet spot. Double-tap for a harder serve.</p>
+            <h3>Controller</h3>
+            <p>Left stick: move/aim · <b>A/✕</b> hit · <b>X/□</b> drop · <b>B/○</b> deep · <b>Y/△</b> lob · <b>RT/R2</b> power · <b>Start</b> pause</p>
+            <h3>Touch</h3>
+            <p>Drag the left side to move. <b>HIT</b> to swing, <b>POWER</b> for a power shot, <b>LOB</b> to lob.</p>
+          </section>
+        </div>
+        <button class="cta small" id="btn-help-close">Got it</button>
+      </div>
+    </div>
+
+    <!-- Pause -->
+    <div id="pause" class="overlay hidden">
+      <div class="panel small-panel">
+        <h2>Paused</h2>
+        <button class="cta" id="btn-resume">Resume</button>
+        <button class="ghost" id="btn-restart">Restart match</button>
+        <button class="ghost" id="btn-quit">Main menu</button>
+      </div>
+    </div>
+
+    <!-- Match over -->
+    <div id="over" class="overlay hidden">
+      <div class="panel small-panel">
+        <div class="over-kicker">Match complete</div>
+        <h2 id="over-title">Victory</h2>
+        <div class="over-score" id="over-score">3 – 1</div>
+        <table class="stats" id="over-stats"></table>
+        <button class="cta" id="btn-again">Play again</button>
+        <button class="ghost" id="btn-menu">Main menu</button>
+      </div>
+    </div>
+
+    <div id="rotate" class="hidden"><div>Turn your phone sideways for the best view<button class="link" id="btn-rotate-ok">Play anyway</button></div></div>
+    <div id="toast" class="toast hidden"></div>
+
+  </body>
+</html>
