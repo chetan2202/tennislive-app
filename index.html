@@ -12,9 +12,9 @@
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <title>TennisLive</title>
-    <script type="module" crossorigin src="./assets/index-BSvsgCXf.js"></script>
+    <script type="module" crossorigin src="./assets/index-C6uwYKdl.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/three-Brq5CVqZ.js">
-    <link rel="stylesheet" crossorigin href="./assets/index-COa8ABSL.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-CuvDjv04.css">
   <link rel="manifest" href="./manifest.webmanifest"></head>
   <body>
     <canvas id="game"></canvas>
@@ -51,7 +51,7 @@
 
       <div class="energy" title="Energy — power shots cost energy">
         <div class="energy-fill" id="energy-fill"></div>
-        <span>POWER</span>
+        <span>ENERGY</span>
       </div>
 
       <div class="banner" id="banner"></div>
@@ -65,8 +65,14 @@
       </div>
       <div class="touch-buttons">
         <button class="tbtn tbtn-lob" id="t-lob">LOB</button>
-        <button class="tbtn tbtn-power" id="t-power">POWER</button>
-        <button class="tbtn tbtn-hit" id="t-hit">HIT</button>
+        <!-- The HIT button is a joystick: tap the middle for your default shot, or press / slide toward an edge to pick one. -->
+        <button class="tbtn tbtn-hit" id="t-hit">
+          <span class="hit-c">HIT</span>
+          <span class="pk pk-up"><i class="for-serve">KICK</i><i class="for-rally">TOPSPIN</i></span>
+          <span class="pk pk-right"><i class="for-serve">FLAT</i><i class="for-rally">FLAT</i></span>
+          <span class="pk pk-down"><i class="for-serve">SLICE</i><i class="for-rally">DROP</i></span>
+          <span class="pk pk-left"><i class="for-serve">TOPSPIN</i><i class="for-rally">LOB</i></span>
+        </button>
       </div>
     </div>
 
@@ -102,6 +108,23 @@
           </div>
           <div class="opt-note" id="length-note"></div>
         </div>
+        <div class="opt-group">
+          <div class="opt-label">Default serve</div>
+          <div class="seg" data-opt="serve">
+            <button data-v="flat">Flat</button>
+            <button data-v="kick">Kick</button>
+            <button data-v="topspin">Topspin</button>
+            <button data-v="slice">Slice</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="opt-label">Default shot</div>
+          <div class="seg" data-opt="shot">
+            <button data-v="topspin">Topspin</button>
+            <button data-v="flat">Flat</button>
+            <button data-v="drop">Drop shot</button>
+          </div>
+        </div>
 
         <button class="cta" id="btn-play">PLAY</button>
         <div class="menu-links">
@@ -122,20 +145,22 @@
               <dt><kbd>WASD</kbd> / <kbd>Arrows</kbd></dt><dd>Move</dd>
               <dt><kbd>Space</kbd></dt><dd>Swing — press just before the ball reaches you</dd>
               <dt>Hold <kbd>←</kbd>/<kbd>→</kbd> while swinging</dt><dd>Aim left / right</dd>
-              <dt>Hold <kbd>↑</kbd> while swinging</dt><dd>Deep shot</dd>
-              <dt>Hold <kbd>↓</kbd> while swinging</dt><dd>Drop shot</dd>
-              <dt><kbd>Shift</kbd>+<kbd>Space</kbd> or double-tap</dt><dd>Power shot (uses energy)</dd>
+              <dt>Hold <kbd>↑</kbd> / <kbd>↓</kbd> while swinging</dt><dd>Deeper / shorter</dd>
+              <dt><kbd>Space</kbd></dt><dd>Your default shot (set in the menu or the pause menu)</dd>
+              <dt><kbd>I</kbd> <kbd>L</kbd> <kbd>K</kbd> <kbd>J</kbd></dt><dd>Swing with a chosen shot: topspin · flat · drop shot · lob</dd>
+              <dt><kbd>Shift</kbd>+<kbd>Space</kbd> or double-tap</dt><dd>Flat (a full flat hit uses energy)</dd>
               <dt><kbd>R</kbd></dt><dd>Lob</dd>
+              <dt>High ball near the net</dt><dd>Smash (automatic)</dd>
               <dt><kbd>P</kbd> · <kbd>F</kbd> · <kbd>M</kbd></dt><dd>Pause · Fullscreen · Sound</dd>
             </dl>
           </section>
           <section>
             <h3>Serving</h3>
-            <p>Arrows move the yellow target. <kbd>Space</kbd> tosses the ball. Press <kbd>Space</kbd> again just before the ball reaches the ring above you — the ring turns yellow in the sweet spot. Double-tap for a harder serve.</p>
+            <p>You bounce the ball while you aim with the arrows. <kbd>Space</kbd> tosses. Hit just before the ball reaches the ring: <kbd>Space</kbd> for your default serve, or <kbd>I</kbd> kick · <kbd>L</kbd> flat · <kbd>K</kbd> slice · <kbd>J</kbd> topspin. A second serve without a pick is a safe kick.</p>
             <h3>Controller</h3>
-            <p>Left stick: move/aim · <b>A/✕</b> hit · <b>X/□</b> drop · <b>B/○</b> deep · <b>Y/△</b> lob · <b>RT/R2</b> power · <b>Start</b> pause</p>
+            <p>Left stick: move/aim · <b>A/✕</b> default shot · <b>Y/△</b> up · <b>B/○</b> right · <b>X/□</b> down · <b>LB/L1</b> left (shots as for I L K J) · <b>RT/R2</b> flat · <b>Start</b> pause</p>
             <h3>Touch</h3>
-            <p>Drag the left side to move. <b>HIT</b> to swing, <b>POWER</b> for a power shot, <b>LOB</b> to lob.</p>
+            <p>Drag the left side to move. <b>HIT</b> is a joystick: tap the middle for your default shot, or press or slide toward an edge to pick the shot written there. <b>LOB</b> to lob.</p>
           </section>
         </div>
         <button class="cta small" id="btn-help-close">Got it</button>
@@ -146,6 +171,23 @@
     <div id="pause" class="overlay hidden">
       <div class="panel small-panel">
         <h2>Paused</h2>
+        <div class="opt-group">
+          <div class="opt-label">Default serve</div>
+          <div class="seg" data-opt="serve">
+            <button data-v="flat">Flat</button>
+            <button data-v="kick">Kick</button>
+            <button data-v="topspin">Topspin</button>
+            <button data-v="slice">Slice</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="opt-label">Default shot</div>
+          <div class="seg" data-opt="shot">
+            <button data-v="topspin">Topspin</button>
+            <button data-v="flat">Flat</button>
+            <button data-v="drop">Drop shot</button>
+          </div>
+        </div>
         <button class="cta" id="btn-resume">Resume</button>
         <button class="ghost" id="btn-restart">Restart match</button>
         <button class="ghost" id="btn-quit">Main menu</button>
