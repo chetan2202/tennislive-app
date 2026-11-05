@@ -12,9 +12,9 @@
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <title>TennisLive</title>
-    <script type="module" crossorigin src="./assets/index-B3Ms1du7.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/three-C9hGUK_B.js">
-    <link rel="stylesheet" crossorigin href="./assets/index-BwcDV7zX.css">
+    <script type="module" crossorigin src="./assets/index-tvsQGw3G.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/three-DTFSGI2b.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-CrHFVVFc.css">
   <link rel="manifest" href="./manifest.webmanifest"></head>
   <body>
     <canvas id="game"></canvas>
@@ -41,6 +41,7 @@
           <span>Score <b id="pb-score">0</b></span>
         </div>
         <div class="pb-best" id="pb-best"></div>
+        <button class="pb-change" id="btn-pb-drill">Change drill</button>
       </div>
 
       <div class="hud-buttons">
@@ -219,7 +220,7 @@
             <h3>Practice</h3>
             <p>Pick <b>Practice</b> and a drill. Each drill is 20 balls: 3 points in a yellow target, 1 point in the court. Your best score is saved per drill and coach level.</p>
             <h3>Exit</h3>
-            <p>Hold the <b>&times;</b> button at the top (or hold <kbd>Esc</kbd>) to leave a match or drill.</p>
+            <p>Hold the <b>&times;</b> button at the top (or hold <kbd>Esc</kbd>) to close the game and free its memory. To go back to the menu instead, use <b>Main menu</b> in the pause menu.</p>
           </section>
         </div>
         <button class="cta small" id="btn-help-close">Got it</button>
@@ -248,6 +249,7 @@
           </div>
         </div>
         <button class="cta" id="btn-resume">Resume</button>
+        <button class="ghost in-practice" id="btn-pause-drill">Change drill</button>
         <button class="ghost" id="btn-restart">Restart</button>
         <button class="ghost" id="btn-quit">Main menu</button>
       </div>
@@ -261,12 +263,42 @@
         <div class="over-score" id="over-score">3 – 1</div>
         <table class="stats" id="over-stats"></table>
         <button class="cta" id="btn-again">Play again</button>
+        <button class="ghost in-practice" id="btn-over-drill">Change drill</button>
         <button class="ghost" id="btn-menu">Main menu</button>
+      </div>
+    </div>
+
+    <!-- Practice: how to play the drill, before the first ball -->
+    <div id="tips" class="overlay tips-overlay hidden">
+      <div class="panel tips-panel">
+        <div class="over-kicker">How to play</div>
+        <h2 id="tips-title"></h2>
+        <ul class="tips-list" id="tips-list"></ul>
+        <div class="tips-timer"><div class="tips-fill" id="tips-fill"></div></div>
+        <button class="cta small" id="btn-tips-skip">Skip</button>
+      </div>
+    </div>
+
+    <!-- Practice: pick another drill without going back to the menu -->
+    <div id="drills" class="overlay hidden">
+      <div class="panel drills-panel">
+        <h2>Change drill</h2>
+        <div class="drill-list" id="drill-list"></div>
+        <button class="ghost" id="btn-drills-back">Back</button>
       </div>
     </div>
 
     <div id="rotate" class="hidden"><div>Turn your phone sideways for the best view<button class="link" id="btn-rotate-ok">Play anyway</button></div></div>
     <div id="toast" class="toast hidden"></div>
+
+    <!-- Shown after the exit hold, when the browser does not let the page close its own window. -->
+    <div id="closed" class="overlay hidden">
+      <div class="panel small-panel">
+        <h2>TennisLive closed</h2>
+        <p class="closed-note">The game has stopped and freed its memory. You can close this tab or app now.</p>
+        <button class="cta" id="btn-reopen">Open again</button>
+      </div>
+    </div>
 
   </body>
 </html>
