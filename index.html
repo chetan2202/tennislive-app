@@ -12,9 +12,9 @@
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <title>TennisLive</title>
-    <script type="module" crossorigin src="./assets/index-C6uwYKdl.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/three-Brq5CVqZ.js">
-    <link rel="stylesheet" crossorigin href="./assets/index-CuvDjv04.css">
+    <script type="module" crossorigin src="./assets/index-B3Ms1du7.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/three-C9hGUK_B.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-BwcDV7zX.css">
   <link rel="manifest" href="./manifest.webmanifest"></head>
   <body>
     <canvas id="game"></canvas>
@@ -31,7 +31,24 @@
         <div class="sb-status" id="sb-status"></div>
       </div>
 
+      <div class="hold-hint" id="hold-hint">Hold to exit</div>
+
+      <!-- Practice: drill, ball count and score (replaces the scoreboard) -->
+      <div class="practice-board hidden" id="practice-board" aria-live="polite">
+        <div class="pb-name" id="pb-name"></div>
+        <div class="pb-row">
+          <span>Ball <b id="pb-ball">1</b>/<span id="pb-balls">20</span></span>
+          <span>Score <b id="pb-score">0</b></span>
+        </div>
+        <div class="pb-best" id="pb-best"></div>
+      </div>
+
       <div class="hud-buttons">
+        <!-- Exit: only a long press leaves, so a stray tap never ends a match. -->
+        <button class="icon-btn hold-btn" id="btn-exit" aria-label="Exit (hold)" title="Hold to exit">
+          <span class="hold-fill"></span>
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
         <button class="icon-btn" id="btn-pause" aria-label="Pause (P)" title="Pause (P)">
           <svg viewBox="0 0 24 24"><path d="M7 5h3v14H7zM14 5h3v14h-3z" /></svg>
         </button>
@@ -83,7 +100,45 @@
         <p class="tagline">Free browser tennis · works offline</p>
 
         <div class="opt-group">
-          <div class="opt-label">Opponent</div>
+          <div class="seg seg-mode" data-opt="mode">
+            <button data-v="match">Match</button>
+            <button data-v="practice">Practice</button>
+          </div>
+        </div>
+        <div class="opt-group practice-only">
+          <div class="opt-label">Drill</div>
+          <select class="pick" id="pick-drill" aria-label="Drill"></select>
+          <div class="opt-note" id="drill-note"></div>
+        </div>
+        <div class="opt-group practice-only drill-serve">
+          <div class="opt-label">Serve from</div>
+          <div class="seg" data-opt="pSide">
+            <button data-v="deuce">Deuce</button>
+            <button data-v="ad">Ad</button>
+            <button data-v="alternate">Both</button>
+          </div>
+        </div>
+        <div class="opt-group practice-only drill-serve">
+          <div class="opt-label">Target</div>
+          <div class="seg" data-opt="pTarget">
+            <button data-v="T">T</button>
+            <button data-v="body">Body</button>
+            <button data-v="wide">Wide</button>
+            <button data-v="any">All</button>
+          </div>
+        </div>
+        <div class="opt-group practice-only drill-return">
+          <div class="opt-label">Coach serves</div>
+          <div class="seg" data-opt="pServe">
+            <button data-v="flat">Flat</button>
+            <button data-v="kick">Kick</button>
+            <button data-v="slice">Slice</button>
+            <button data-v="topspin">Topspin</button>
+            <button data-v="mix">Mix</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="opt-label" id="level-label">Opponent</div>
           <div class="seg" data-opt="difficulty">
             <button data-v="easy">Easy</button>
             <button data-v="club">Club</button>
@@ -99,7 +154,7 @@
             <button data-v="clay">Clay</button>
           </div>
         </div>
-        <div class="opt-group">
+        <div class="opt-group match-only">
           <div class="opt-label">Match</div>
           <div class="seg" data-opt="length">
             <button data-v="game">1 game</button>
@@ -161,6 +216,10 @@
             <p>Left stick: move/aim · <b>A/✕</b> default shot · <b>Y/△</b> up · <b>B/○</b> right · <b>X/□</b> down · <b>LB/L1</b> left (shots as for I L K J) · <b>RT/R2</b> flat · <b>Start</b> pause</p>
             <h3>Touch</h3>
             <p>Drag the left side to move. <b>HIT</b> is a joystick: tap the middle for your default shot, or press or slide toward an edge to pick the shot written there. <b>LOB</b> to lob.</p>
+            <h3>Practice</h3>
+            <p>Pick <b>Practice</b> and a drill. Each drill is 20 balls: 3 points in a yellow target, 1 point in the court. Your best score is saved per drill and coach level.</p>
+            <h3>Exit</h3>
+            <p>Hold the <b>&times;</b> button at the top (or hold <kbd>Esc</kbd>) to leave a match or drill.</p>
           </section>
         </div>
         <button class="cta small" id="btn-help-close">Got it</button>
@@ -189,7 +248,7 @@
           </div>
         </div>
         <button class="cta" id="btn-resume">Resume</button>
-        <button class="ghost" id="btn-restart">Restart match</button>
+        <button class="ghost" id="btn-restart">Restart</button>
         <button class="ghost" id="btn-quit">Main menu</button>
       </div>
     </div>
@@ -197,7 +256,7 @@
     <!-- Match over -->
     <div id="over" class="overlay hidden">
       <div class="panel small-panel">
-        <div class="over-kicker">Match complete</div>
+        <div class="over-kicker" id="over-kicker">Match complete</div>
         <h2 id="over-title">Victory</h2>
         <div class="over-score" id="over-score">3 – 1</div>
         <table class="stats" id="over-stats"></table>
@@ -208,6 +267,6 @@
 
     <div id="rotate" class="hidden"><div>Turn your phone sideways for the best view<button class="link" id="btn-rotate-ok">Play anyway</button></div></div>
     <div id="toast" class="toast hidden"></div>
-
+
   </body>
 </html>
